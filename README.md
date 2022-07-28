@@ -8,7 +8,8 @@ Requires gpiozero (sudo apt install pyton3-gpiozero)
       -h, --help            show this help message and exit
       -i INTERVAL, --interval INTERVAL
                             poll interval in seconds. Default: 0.05
-      -g GPIO, --gpio GPIO  GPIO pin to use. BCM numbering. Default: 21
+      -g1 GPIO, --gpio1 GPIO  GPIO pin to use. BCM numbering. Default: 17
+      -g2 GPIO, --gpio2 GPIO  GPIO pin to use. BCM numbering. Default: 27
       -l, --active_low      GPIO is active when low.
   -d, --debug           enable debug output.
   
