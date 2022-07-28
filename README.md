@@ -1,3 +1,7 @@
+THIS IS NOT MY WORK !!
+CREDITS BY thagrol
+VISIT THE ORIGINAL https://github.com/thagrol/hdd-led
+
 Simple python3 script to monitor /proc/diskstats and flash an LED depending on activity indicated there in.
 
 Requires gpiozero (sudo apt install pyton3-gpiozero)
