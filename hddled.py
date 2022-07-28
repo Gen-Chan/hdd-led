@@ -17,10 +17,11 @@ import argparse
 import gpiozero
 import logging
 import time
+import re
 
 
 STATSFILE = '/proc/diskstats'
-FIELD = 12
+FIELD = 20
 
 
 # parse cmdline args
@@ -37,11 +38,17 @@ parser.add_argument('-i', '--interval',
                     default=0.05,
                     help='poll interval in seconds. Default: 0.05'
                    )
-parser.add_argument('-g', '--gpio',
+parser.add_argument('-g1', '--gpio1',
                     action='store',
                     type=int,
-                    default=21,
-                    help='GPIO pin to use. BCM numbering. Default: 21'
+                    default=17,
+                    help='GPIO pin to use. BCM numbering. Default: 17'
+                   )
+parser.add_argument('-g2', '--gpio2',
+                    action='store',
+                    type=int,
+                    default=27,
+                    help='GPIO pin to use. BCM numbering. Default: 27'
                    )
 parser.add_argument('-l', '--active_low',
                     action='store_true',
@@ -60,10 +67,14 @@ logging.basicConfig(level=args.debug)
 logging.debug(args)
 
 INTERVAL = args.interval
-GPIO = args.gpio
+GPIO1 = args.gpio1
+GPIO2 = args.gpio2
 ACTIVE_HIGH = not(args.active_low)
 
-led = gpiozero.LED(GPIO,
+led1 = gpiozero.LED(GPIO1,
+                   active_high=ACTIVE_HIGH,
+                   )
+led2 = gpiozero.LED(GPIO2,
                    active_high=ACTIVE_HIGH,
                    )
 
@@ -71,16 +82,33 @@ logging.debug('Starting mian polling loop')
 while True:
     try:
         with open(STATSFILE,mode='r') as s:
-            stats = s.read()
-            disc_active = False
-        for l in stats.split('\n'):
+            for line in s:
+                if re.search('sda', line):
+                    hdd1 = line
+                if re.search('sdb', line):
+                    hdd2 = line
+
+            disc1_active = False
+            disc2_active = False
+
+            print(hdd2.split(' '))
+
+        for l in hdd1.split(' ')[FIELD]:
             try:
-                if int(l.split()[FIELD - 1]):
-                    disc_active = True
+                if int(l):
+                    disc1_active = True
                     break
             except IndexError:
                 pass
-        led.value = disc_active
+        for l in hdd2.split(' ')[FIELD - 1]:
+            try:
+                if int(l):
+                    disc2_active = True
+                    break
+            except IndexError:
+                pass
+        led1.value = disc1_active
+        led2.value = disc2_active
         time.sleep(INTERVAL)
     except Exception:
         if args.debug:
